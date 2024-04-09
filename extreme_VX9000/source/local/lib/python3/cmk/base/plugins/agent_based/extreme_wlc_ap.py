@@ -72,7 +72,7 @@ def parse_extreme_wlc_ap(string_table: StringTable) -> Optional[Dict[str, Extrem
             # RxFrames=int(rx_frames),
         )
 
-
+    print(string_table)
     return section
 
 
@@ -90,45 +90,11 @@ def check_extreme_wlc_ap(item, params, section: Dict[str, ExtremeWlcAp]) -> Chec
         yield Result(state=State(not_found_state), notice='Item not found in SNMP data')
         return
 
-    if ap.MacAddress != params['ap_inv_mac']:
-        yield Result(
-            state=State.WARN,
-            notice=f'AP changed, MAC address (found/expected): {ap.MacAddress}/{params["ap_inv_mac"]}'
-        )
-
-    yield Result(state=State.OK, notice=f'IP address: {ap.IpAddress}')
-    yield Result(state=State.OK, notice=f'MAC address: {ap.MacAddress}')
     if ap.AdminState != '1':
         yield Result(state=State.WARN, notice=f'Admin state: {_extreme_adminstate(ap.AdminState)}')
     else:
         yield Result(state=State.OK, notice=f'Admin state: {_extreme_adminstate(ap.AdminState)}')
 
-    yield from check_levels(
-        value=ap.Clients,
-        label='Clients',
-        render_func=lambda v: f'{v:.0f}',
-        metric_name=f'{metric_prefix}number_of_clients',
-    )
-
-    now_time = time.time()
-    value_store = get_value_store()
-    raise_ingore_res = False
-
-    for label, value, metric in [
-        ('TX frames', ap.TxFrames, 'tx_frames'),
-        ('RX frames', ap.RxFrames, 'rx_frames')
-    ]:
-        try:
-            value = get_rate(value_store, f'{metric}.{item}', now_time, value, raise_overflow=True)
-        except GetRateError:
-            raise_ingore_res = True
-            value = 0
-        yield from check_levels(
-            value=value,
-            label=label,
-            metric_name=f'{metric_prefix}{metric}',
-            render_func=lambda v: f'{float(v):.2f}/s'
-        )
     yield Result(state=State.OK, summary=f'Name: {ap.Name}')
 
     if raise_ingore_res:
@@ -157,7 +123,7 @@ register.snmp_section(
                 "11",  # wingStatsRfdWlApInfoLocation
             ],
         ),    
-    detect=startswith(''.1.3.6.1.2.1.1.1.0', 'VX9000'),  # iso.3.6.1.2.1.1.1.0 = STRING: "VX9000 Wireless Controller, Version 7.7.1.5-003R MIB=01a"
+    detect=startswith('.1.3.6.1.2.1.1.1.0', 'VX9000'),  # sysDescr
 )
 
 register.check_plugin(
