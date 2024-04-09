@@ -124,7 +124,7 @@ register.snmp_section(
                 "11",  # wingStatsRfdWlApInfoLocation
             ],
         ),
-    ]
+    ],
     detect=startswith('.1.3.6.1.2.1.1.1.0', 'VX9000'),  # sysDescr
 )
 
