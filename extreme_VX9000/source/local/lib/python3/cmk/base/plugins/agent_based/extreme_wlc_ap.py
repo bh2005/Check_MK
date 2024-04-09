@@ -10,7 +10,7 @@
 # rewrite for Extreme VX
 #
 import time
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 from dataclasses import dataclass
 
 from cmk.base.plugins.agent_based.agent_based_api.v1 import (
@@ -53,7 +53,7 @@ def _extreme_adminstate(state):
     return names.get(state, 'unknown')
 
 
-def parse_extreme_wlc_ap(string_table: StringTable) -> Optional[Dict[str, ExtremeWlcAp]]:
+def parse_extreme_wlc_ap(string_table: List[StringTable]) -> Optional[Dict[str, ExtremeWlcAp]]:
     section = {}
     for ap in string_table:
         try:
@@ -104,7 +104,7 @@ def check_extreme_wlc_ap(item, params, section: Dict[str, ExtremeWlcAp]) -> Chec
 register.snmp_section(
     name='extreme_wlc_ap',
     parse_function=parse_extreme_wlc_ap,
-   fetch=[
+    fetch=[
         SNMPTree(
             base='.1.3.6.1.4.1.388.50.1.4.2.1.1',  # wingStatsDevTable
             oids=[
