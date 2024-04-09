@@ -72,7 +72,7 @@ def parse_extreme_wlc_ap(string_table: StringTable) -> Optional[Dict[str, Extrem
             # RxFrames=int(rx_frames),
         )
 
-    print(string_table)
+    #print(string_table)
     return section
 
 
