@@ -104,25 +104,27 @@ def check_extreme_wlc_ap(item, params, section: Dict[str, ExtremeWlcAp]) -> Chec
 register.snmp_section(
     name='extreme_wlc_ap',
     parse_function=parse_extreme_wlc_ap,
-    fetch=SNMPTree(
-        base='.1.3.6.1.4.1.388.50.1.4.2.1.1',  # wingStatsDevTable
-        oids=[
-            '1',  # wingStatsDevMac
-            # '2',  # wingStatsDevType
-            '3',  # wingStatsDevHostname
-            # '4',  # wingStatsDevVersion
-            # '5',  # wingStatsDevSerialNo
-            # '6',  # wingStatsDevRfDomainName
-            '7',  # wingStatsDevOnline
+   fetch=[
+        SNMPTree(
+            base='.1.3.6.1.4.1.388.50.1.4.2.1.1',  # wingStatsDevTable
+            oids=[
+                '1',  # wingStatsDevMac
+                # '2',  # wingStatsDevType
+                '3',  # wingStatsDevHostname
+                # '4',  # wingStatsDevVersion
+                # '5',  # wingStatsDevSerialNo
+                # '6',  # wingStatsDevRfDomainName
+                '7',  # wingStatsDevOnline
             ],
         ),    
-           SNMPTree(
+        SNMPTree(
             base=".1.3.6.1.4.1.388.50.1.4.2.25.1.1.1", # wingStatsRfdWlApInfoEntry
             oids=[
                 "13",  # wingStatsRfdWlApInfoIp
                 "11",  # wingStatsRfdWlApInfoLocation
             ],
-        ),    
+        ),
+    ]
     detect=startswith('.1.3.6.1.2.1.1.1.0', 'VX9000'),  # sysDescr
 )
 
