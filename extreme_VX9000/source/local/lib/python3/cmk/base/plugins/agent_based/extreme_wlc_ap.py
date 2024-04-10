@@ -12,6 +12,7 @@
 import time
 from typing import Optional, Dict, List
 from dataclasses import dataclass
+from cmk.utils import debug
 
 from cmk.base.plugins.agent_based.agent_based_api.v1 import (
     register,
@@ -54,6 +55,9 @@ def _extreme_adminstate(state):
 
 
 def parse_extreme_wlc_ap(string_table: List[StringTable]) -> Optional[Dict[str, ExtremeWlcAp]]:
+    if debug.enabled():
+        print(string_table)
+        
     section = {}
     for ap in string_table:
         try:
@@ -73,16 +77,21 @@ def parse_extreme_wlc_ap(string_table: List[StringTable]) -> Optional[Dict[str, 
             # RxFrames=int(rx_frames),
         )
 
-    #print(string_table)
+    if debug.enabled():
+        print(section)
     return section
 
 
 def discovery_extreme_wlc_ap(section: Dict[str, ExtremeWlcAp]) -> DiscoveryResult:
+    if debug.enabled():
+        print(section)
     for ap in section.keys():
         yield Service(item=ap, parameters={'ap_inv_mac': section[ap].MacAddress})
 
 
 def check_extreme_wlc_ap(item, params, section: Dict[str, ExtremeWlcAp]) -> CheckResult:
+    if debug.enabled():
+        print(section)    
     not_found_state = params['state_not_found']
     metric_prefix = 'extreme_wlc_ap_'
     try:
