@@ -58,6 +58,7 @@ def parse_extreme_wlc_ap(string_table: List[StringTable]) -> Optional[Dict[str, 
     for ap in string_table:
         try:
             ap_mac_address, ap_name_description, admin_state, ap_ip_address, ap_location = ap
+#            ap_mac_address, ap_name_description, admin_state= ap
         except ValueError:
             return
 
@@ -116,12 +117,12 @@ register.snmp_section(
                 # '6',  # wingStatsDevRfDomainName
                 '7',  # wingStatsDevOnline
             ],
-        ),    
+        ),
         SNMPTree(
-            base=".1.3.6.1.4.1.388.50.1.4.2.25.1.1.1", # wingStatsRfdWlApInfoEntry
+            base='.1.3.6.1.4.1.388.50.1.4.2.25.1.1.1', # wingStatsRfdWlApInfoEntry
             oids=[
-                "13",  # wingStatsRfdWlApInfoIp
-                "11",  # wingStatsRfdWlApInfoLocation
+                '13',  # wingStatsRfdWlApInfoIp
+                '11',  # wingStatsRfdWlApInfoLocation
             ],
         ),
     ],
