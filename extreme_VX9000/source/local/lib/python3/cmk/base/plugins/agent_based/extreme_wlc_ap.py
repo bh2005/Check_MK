@@ -39,8 +39,8 @@ class ExtremeWlcAp:
     MacAddress: str
     Name: str
     AdminState: str
-    IpAddress: str
-    Location: str
+#    IpAddress: str
+#    Location: str
     # Clients: int
     # TxFrames: int
     # RxFrames: int
@@ -59,7 +59,7 @@ def parse_extreme_wlc_ap(string_table: List[StringTable]) -> Optional[Dict[str, 
         print(string_table)
         
     section = {}
-    for ap in string_table:
+    for ap in string_table[0]:
         try:
 #            ap_mac_address, ap_name_description, admin_state, ap_ip_address, ap_location = ap
             ap_mac_address, ap_name_description, admin_state= ap
@@ -71,8 +71,8 @@ def parse_extreme_wlc_ap(string_table: List[StringTable]) -> Optional[Dict[str, 
             Name=ap_name_description,
             # Clients=int(number_of_clients),
             AdminState=admin_state,
-            IpAddress=ap_ip_address,
-            Location=ap_location,
+#            IpAddress=ap_ip_address,
+#            Location=ap_location,
             # TxFrames=int(tx_frames),
             # RxFrames=int(rx_frames),
         )
