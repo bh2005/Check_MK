@@ -26,6 +26,7 @@ from cmk.base.plugins.agent_based.agent_based_api.v1 import (
     GetRateError,
     get_value_store,
     IgnoreResultsError,
+    render,
 )
 from cmk.base.plugins.agent_based.agent_based_api.v1.type_defs import (
     DiscoveryResult,
@@ -36,15 +37,20 @@ from cmk.base.plugins.agent_based.agent_based_api.v1.type_defs import (
 
 @dataclass
 class ExtremeWlcAp:
-    MacAddress: str
+#    MacAddress: str
     Name: str
     AdminState: str
-#    IpAddress: str
+    RfDomain: str
+    IpAddress: str
 #    Location: str
     # Clients: int
     # TxFrames: int
     # RxFrames: int
 
+
+def _render_mac_address_(bytes_: List[int]):
+    if len(bytes_) == 6:
+        return ':'.join(f'{hex(m).upper()[2:]:0>2}' for m in bytes_)
 
 def _extreme_adminstate(state):
     names = {
@@ -61,17 +67,18 @@ def parse_extreme_wlc_ap(string_table: List[StringTable]) -> Optional[Dict[str, 
     section = {}
     for ap in string_table[0]:
         try:
-#            ap_mac_address, ap_name_description, admin_state, ap_ip_address, ap_location = ap
-            ap_mac_address, ap_name_description, admin_state= ap
+#            ap_mac_address, ap_hostname, admin_state, ap_ip_address, ap_location = ap
+             ap_hostname, admin_state, ap_rf_domain = ap
         except ValueError:
             return
 
-        section[f'{ap_mac_address}'] = ExtremeWlcAp(
-            MacAddress=ap_mac_address,
-            Name=ap_name_description,
+        section[f'{ap_hostname}'] = ExtremeWlcAp(
+#            MacAddress=_render_mac_address_(ap_mac_address),
+            Name=ap_hostname,
             # Clients=int(number_of_clients),
             AdminState=admin_state,
-#            IpAddress=ap_ip_address,
+            RfDomain=ap_rf_domain,
+            IpAddress=ap_ip_address,
 #            Location=ap_location,
             # TxFrames=int(tx_frames),
             # RxFrames=int(rx_frames),
@@ -86,7 +93,7 @@ def discovery_extreme_wlc_ap(section: Dict[str, ExtremeWlcAp]) -> DiscoveryResul
     if debug.enabled():
         print(section)
     for ap in section.keys():
-        yield Service(item=ap, parameters={'ap_inv_mac': section[ap].MacAddress})
+        yield Service(item=ap, parameters={'ap_inv_name': section[ap].Name})
 
 
 def check_extreme_wlc_ap(item, params, section: Dict[str, ExtremeWlcAp]) -> CheckResult:
@@ -106,9 +113,8 @@ def check_extreme_wlc_ap(item, params, section: Dict[str, ExtremeWlcAp]) -> Chec
         yield Result(state=State.OK, notice=f'Admin state: {_extreme_adminstate(ap.AdminState)}')
 
     yield Result(state=State.OK, summary=f'Name: {ap.Name}')
-
-    if raise_ingore_res:
-        raise IgnoreResultsError('Initializing counters')
+    yield Result(state=State.OK, summary=f'RfDomain: {ap.RfDomain}')
+    yield Result(state=State.OK, summary=f'RfDomain: {ap.IpAddress}')
 
 
 register.snmp_section(
@@ -118,24 +124,26 @@ register.snmp_section(
         SNMPTree(
             base='.1.3.6.1.4.1.388.50.1.4.2.1.1',  # wingStatsDevTable
             oids=[
-                '1',  # wingStatsDevMac
+#                '1',  # wingStatsDevMac
                 # '2',  # wingStatsDevType
                 '3',  # wingStatsDevHostname
-                # '4',  # wingStatsDevVersion
-                # '5',  # wingStatsDevSerialNo
-                # '6',  # wingStatsDevRfDomainName
+#                # '4',  # wingStatsDevVersion
+#                # '5',  # wingStatsDevSerialNo
                 '7',  # wingStatsDevOnline
+                '6',  # wingStatsDevRfDomainName
             ],
         ),
-#        SNMPTree(
-#            base='.1.3.6.1.4.1.388.50.1.4.2.25.1.1.1', # wingStatsRfdWlApInfoEntry
-#            oids=[
+        SNMPTree(
+            base='.1.3.6.1.4.1.388.50.1.4.2.25.1.1.1', # wingStatsRfdWlApInfoEntry
+            oids=[
 #                 '1',  # wingStatsDevWlApInfoMac
 #                 '9',  #wingStatsDevWlApInfoHostname
-#                '13',  # wingStatsRfdWlApInfoIp
 #                '11',  # wingStatsRfdWlApInfoLocation
-#            ],
-#        ),
+                '13',  # wingStatsRfdWlApInfoIp
+            ],
+        ),
+
+
     ],
     detect=startswith('.1.3.6.1.2.1.1.1.0', 'VX9000'),  # sysDescr
 )
