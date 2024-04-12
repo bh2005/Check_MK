@@ -41,8 +41,8 @@ class ExtremeWlcAp:
     Name: str
     AdminState: str
     RfDomain: str
-    IpAddress: str
-#    Location: str
+#    IpAddress: str
+    Location: str
     # Clients: int
     # TxFrames: int
     # RxFrames: int
@@ -68,7 +68,7 @@ def parse_extreme_wlc_ap(string_table: List[StringTable]) -> Optional[Dict[str, 
     for ap in string_table[0]:
         try:
 #            ap_mac_address, ap_hostname, admin_state, ap_ip_address, ap_location = ap
-             ap_hostname, admin_state, ap_rf_domain = ap
+             ap_hostname, admin_state, ap_rf_domain, ap_location = ap
         except ValueError:
             return
 
@@ -78,8 +78,8 @@ def parse_extreme_wlc_ap(string_table: List[StringTable]) -> Optional[Dict[str, 
             # Clients=int(number_of_clients),
             AdminState=admin_state,
             RfDomain=ap_rf_domain,
-            IpAddress=ap_ip_address,
-#            Location=ap_location,
+#            IpAddress=ap_ip_address,
+            Location=ap_location,
             # TxFrames=int(tx_frames),
             # RxFrames=int(rx_frames),
         )
@@ -114,8 +114,8 @@ def check_extreme_wlc_ap(item, params, section: Dict[str, ExtremeWlcAp]) -> Chec
 
     yield Result(state=State.OK, summary=f'Name: {ap.Name}')
     yield Result(state=State.OK, summary=f'RfDomain: {ap.RfDomain}')
-    yield Result(state=State.OK, summary=f'RfDomain: {ap.IpAddress}')
-
+#    yield Result(state=State.OK, summary=f'IpAddress: {ap.IpAddress}')
+    yield Result(state=State.OK, summary=f'Location: {ap.Location}')
 
 register.snmp_section(
     name='extreme_wlc_ap',
@@ -138,7 +138,7 @@ register.snmp_section(
             oids=[
 #                 '1',  # wingStatsDevWlApInfoMac
 #                 '9',  #wingStatsDevWlApInfoHostname
-#                '11',  # wingStatsRfdWlApInfoLocation
+                '11',  # wingStatsRfdWlApInfoLocation
                 '13',  # wingStatsRfdWlApInfoIp
             ],
         ),
