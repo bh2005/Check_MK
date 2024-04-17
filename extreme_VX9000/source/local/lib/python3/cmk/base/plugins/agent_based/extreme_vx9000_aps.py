@@ -110,7 +110,7 @@ register.snmp_section(
                 "13",  # IpAddress
                 "10",  # Zone
                 "6",  # HWVersion = Type
-                "4",  # wingStatsDevWlApInfoNumClients SerialNumber             ???
+                "4",  # wingStatsDevWlApInfoNumClients
                 "11",  # Location
                 #"20",  # HomeState     ???
                 #"7",  # SWVersion      ????
